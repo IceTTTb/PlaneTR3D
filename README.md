@@ -42,6 +42,8 @@ plane_data/
 Download the pretrained model of [HRNet](https://drive.google.com/drive/folders/1dCq4WxconPEDO8uZq4YDctZ8nxtvEtv8?usp=sharing) 
 and place it under the 'ckpts/' folder.
 
+Change the 'root_dir' in config files to the path where you save the data.
+
 Run the following command to train our network on one GPU:
 ```bash
 CUDA_VISIBLE_DEVICES=0 python train_planeTR.py
@@ -55,7 +57,9 @@ CUDA_VISIBLE_DEVICES=0,1,2 python -m torch.distributed.launch --nproc_per_node=3
 Download the pretrained model [here](https://drive.google.com/drive/folders/1dCq4WxconPEDO8uZq4YDctZ8nxtvEtv8?usp=sharing) 
 and place it under the 'ckpts/' folder.
 
-You can change the 'resume_dir' in 'config_planeTR_eval.yaml' to the path where you save your weight file.
+Change the 'resume_dir' in 'config_planeTR_eval.yaml' to the path where you save the weight file.
+
+Change the 'root_dir' in config files to the path where you save the data.
 
 Run the following command to evaluate the performance:
 ```bash

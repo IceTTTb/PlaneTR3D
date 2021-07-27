@@ -20,10 +20,10 @@ solver:
 
 dataset:
   name: 'scannet'
-  root_dir: /data/users/tanbin/dataset/processed_planeAE
+  root_dir: DATA_FOLDER/
   batch_size: 24
   num_workers: 12
-  root_dir_names: ['nyu_plane/', 'processed_planeAE/', 'NYU_official']
+  root_dir_names: []
 
 model:
   arch: hrnet_w32

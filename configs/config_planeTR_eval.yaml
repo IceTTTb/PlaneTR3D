@@ -7,10 +7,10 @@ save_path: results/
 
 dataset:
   name: 'scannet'
-  root_dir: /data/users/tanbin/dataset/processed_planeAE
+  root_dir: DATA_FOLDER/
   batch_size: 1
   num_workers: 1
-  root_dir_names: ['nyu_plane/', 'processed_planeAE/', 'NYU_official']
+  root_dir_names: []
 
 
 model:
