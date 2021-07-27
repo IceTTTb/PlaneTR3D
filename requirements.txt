@@ -1,0 +1,10 @@
+imageio
+scipy
+argparse
+Pillow
+sacred
+easydict
+pymongo
+pyyaml
+matplotlib
+opencv-python
