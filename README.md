@@ -8,7 +8,7 @@ This is the official implementation of our [ICCV 2021 paper]()
 
 Clone the repository:
 ```bash
-git clone 
+git clone https://github.com/IceTTTb/PlaneTR3D.git
 ```
 
 We use Python 3.6 and PyTorch 1.6.0 in our implementation, please install dependencies:
