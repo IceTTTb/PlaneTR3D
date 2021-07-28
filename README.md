@@ -71,7 +71,7 @@ If you find our work useful in your research, please consider citing:
 ```bash
 @inproceedings{tan2021planeTR,
 title={PlaneTR: Structure-Guided Transformers for 3D Plane Recovery},
-author={Tan, Bin and Xue, Nan and Bai, Song and Wu Tianfu and Xia Gui-Song},
+author={Tan, Bin and Xue, Nan and Bai, Song and Wu, Tianfu and Xia, Gui-Song},
 booktitle = {International Conference on Computer Vision},
 year={2021}
 }
