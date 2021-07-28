@@ -25,7 +25,7 @@ We follow [PlaneAE](https://github.com/svip-lab/PlanarReconstruction) to convert
 Please refer to [PlaneAE](https://github.com/svip-lab/PlanarReconstruction) for more details.
 
 We generate line segments using the state-of-the-art line segment detection algorithm [HAWP](https://github.com/cherubicXN/hawp) with their pretrained model.
-The processed line segments data we used can be downloaded [here](https://drive.google.com/drive/folders/1Kj6fvTQfPB4TolwiCRpQnlvJfs2vKvJx?usp=sharing)
+The processed line segments data we used can be downloaded [here](https://drive.google.com/drive/folders/1Kj6fvTQfPB4TolwiCRpQnlvJfs2vKvJx?usp=sharing).
 
 The structure of the data folder should be
 ```

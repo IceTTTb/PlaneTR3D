@@ -453,7 +453,8 @@ class SetCriterion(nn.Module):
 
         # In case of auxiliary losses, we repeat this process with the output of each intermediate layer.
         losses_aux = []
-        if 'aux_outputs' in outputs:
+
+        if 'aux_outputs' in outputs.keys():
             for i, aux_outputs in enumerate(outputs['aux_outputs']):
                 losses_aux_i = {}
                 # print(aux_outputs.keys())
@@ -463,7 +464,7 @@ class SetCriterion(nn.Module):
                     kwargs = {}
                     # if 'embedding' in loss:
                     #     continue
-                    if 'param' in loss or 'Q' in loss or 'depth' or 'prob_pixel' in loss: #or 'embedding' in loss:
+                    if 'param' in loss or 'Q' in loss or 'depth' in loss: #or 'embedding' in loss:
                         continue
                     # Logging is enabled only for the last layer
                     kwargs = {'log': False}
