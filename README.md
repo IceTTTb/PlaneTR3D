@@ -4,6 +4,9 @@ This is the official implementation of our [ICCV 2021 paper]()
 
 <img src="misc/network.jpg" width="600">
 
+## TODO
+- Supplement 2D/3D visualization code. 
+
 ## Getting Started
 
 Clone the repository:
