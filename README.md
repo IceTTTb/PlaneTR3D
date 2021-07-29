@@ -1,6 +1,6 @@
 # PlaneTR: Structure-Guided Transformers for 3D Plane Recovery
 
-This is the official implementation of our [ICCV 2021 paper]()
+This is the official implementation of our [ICCV 2021 paper](https://arxiv.org/abs/2107.13108)
 
 <img src="misc/network.jpg" width="600">
 
