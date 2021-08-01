@@ -4,11 +4,6 @@ This is the official implementation of our [ICCV 2021 paper](https://arxiv.org/a
 
 <img src="misc/network.jpg" width="600">
 
-## News
-There maybe some bugs in the current public code and I am trying my best to solve them.
-
-Contact me if you have any question.
-
 ## TODO
 - Supplement 2D/3D visualization code. 
 
