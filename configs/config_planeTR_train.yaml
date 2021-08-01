@@ -2,14 +2,14 @@ seed: 123
 resume_dir: None
 save_model: True
 save_log: True
-save_path: my_runs/run3/
-if_debug: True
+save_path: my_runs/planeTR/
+if_debug: False
 debug_interval: 150
 
 num_epochs: 62
-print_interval: 50
-save_step: 4
-aux_weight: 0.1
+print_interval: 25
+save_step: 2
+aux_weight: 0.2
 
 solver:
   method: adam
@@ -21,7 +21,7 @@ solver:
 dataset:
   name: 'scannet'
   root_dir: DATA_FOLDER/
-  batch_size: 24
+  batch_size: 24  #-----------------------------------------------
   num_workers: 12
   root_dir_names: []
 

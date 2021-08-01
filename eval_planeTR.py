@@ -116,15 +116,16 @@ def eval(cfg, logger):
     # load pretrained weights if existed
     if not (cfg.resume_dir == 'None'):
         loc = 'cuda:{}'.format(args.local_rank)
-        model_dict = torch.load(cfg.resume_dir, map_location=loc)
+        # model_dict = torch.load(cfg.resume_dir, map_location=loc)
+        model_dict = torch.load(cfg.resume_dir)
         model_dict_ = {}
         if NUM_GPUS > 1:
             for k, v in model_dict.items():
                 k_ = 'module.' + k
                 model_dict_[k_] = v
-            network.load_state_dict(model_dict_)
+            network.load_state_dict(model_dict_, strict=False)
         else:
-            network.load_state_dict(model_dict)
+            network.load_state_dict(model_dict, strict=False)
 
     # build data loader
     data_loader, _ = load_dataset(cfg, args)

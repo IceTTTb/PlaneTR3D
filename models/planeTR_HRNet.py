@@ -202,6 +202,7 @@ class PlaneTR_HRNet(nn.Module):
         self.use_lines = use_lines
         self.num_sample_pts = cfg.model.num_sample_pts
         self.if_predict_depth = cfg.model.if_predict_depth
+        self.if_shareHeads = True
         assert cfg.model.stride == 1
 
         self.hidden_dim = 256
@@ -301,7 +302,6 @@ class PlaneTR_HRNet(nn.Module):
 
             mask_temp = mask_lines.unsqueeze(-1).float()
             lines_feat = lines_feat * (1 - mask_temp)  # B, max_line_num, hidden_dim
-            lines_pos = lines_pos * (1 - mask_temp)  # B, max_line_num, hidden_dim
 
             hs_all, _, memory = self.transformer(src, self.query_embed.weight, pos, tgt=None,
                                                        src_lines=lines_feat, mask_lines=mask_lines,
@@ -314,14 +314,14 @@ class PlaneTR_HRNet(nn.Module):
         # ------------------------------------------------------- plane instance decoder
         hs = hs_all[-self.loss_layer_num:, :, :, :].contiguous()  # dec_layers, b, num_queries, hidden_dim
         # plane embedding
-        plane_embedding = self.plane_embedding(hs)  # 1, b, num_queries, 2
+        plane_embedding = self.plane_embedding(hs)  # dec_layers, b, num_queries, 2
         # plane classifier
-        plane_prob = self.plane_prob(hs)  # 1, b, num_queries, 3
+        plane_prob = self.plane_prob(hs)  # dec_layers, b, num_queries, 3
         # plane parameters
-        plane_param = self.plane_param(hs)  # 1, b, num_queries, 3
+        plane_param = self.plane_param(hs)  # dec_layers, b, num_queries, 3
         # plane center
         if self.predict_center:
-            plane_center = self.plane_center(hs)  # 1, b, num_queries, 2
+            plane_center = self.plane_center(hs)  # dec_layers, b, num_queries, 2
             plane_center = torch.sigmoid(plane_center)
 
         # --------------------------------------------------- pixel-level decoder
@@ -340,17 +340,18 @@ class PlaneTR_HRNet(nn.Module):
         if self.predict_center:
             output['pixel_center'] = pixel_center
             output['pred_center'] = plane_center[-1]
+
         if self.if_predict_depth:
             output['pixel_depth'] = pixel_depth
+
         if self.loss_layer_num > 1 and self.training:
-            assert self.loss_layer_num == 3
-            assert plane_prob.shape[0] == 3
             aux_outputs = []
-            for i in range(self.loss_layer_num - 1):
-                aux_1 = {'pred_logits': plane_prob[i], 'pred_plane_embedding': plane_embedding[i],
-                         'pixel_embedding': pixel_embedding}
-                if self.predict_center:
-                    aux_1['pred_center'] = plane_center[i]
-                aux_outputs.append(aux_1)
+            aux_l = {'pred_logits': plane_prob[1], 'pred_plane_embedding': plane_embedding[1],
+                     'pixel_embedding': pixel_embedding}
+            if self.predict_center:
+                aux_l['pred_center'] = plane_center[1]
+            aux_outputs.append(aux_l)
+
             output['aux_outputs'] = aux_outputs
+
         return output

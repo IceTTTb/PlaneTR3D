@@ -123,7 +123,7 @@ def train(cfg, logger):
         loc = 'cuda:{}'.format(args.local_rank)
         model_dict = torch.load(cfg.resume_dir, map_location=loc)
         model_dict_ = {}
-        if cfg.num_gpus > 1:
+        if NUM_GPUS > 1:
             for k, v in model_dict.items():
                 k_ = 'module.' + k
                 model_dict_[k_] = v
@@ -231,8 +231,10 @@ def train(cfg, logger):
                 loss_lastLayer = sum(loss_dict[k] * weight_dict[k] for k in loss_dict.keys() if k in weight_dict)
                 loss_aux = 0.
                 aux_weight = cfg.aux_weight
-                for k in range(len(loss_dict_aux)):
-                    loss_aux += sum(loss_dict_aux[i][k] * weight_dict[k] for k in loss_dict_aux[i].keys() if k in weight_dict) * aux_weight
+                for li in range(len(loss_dict_aux)):
+                    loss_aux_li = sum(loss_dict_aux[li][k] * weight_dict[k] for k in loss_dict_aux[li].keys() if k in weight_dict)
+                    loss_aux += (loss_aux_li * aux_weight)
+
                 loss_final = loss_lastLayer + loss_aux
             else:
                 loss_final = sum(loss_dict[k] * weight_dict[k] for k in loss_dict.keys() if k in weight_dict)
@@ -244,6 +246,7 @@ def train(cfg, logger):
 
             # --------------------------------------  update losses and metrics
             losses.update(loss_final.item())
+
             for name_log in metric_tracker.keys():
                 name_loss = metric_tracker[name_log][0]
                 if name_loss in loss_dict.keys():
@@ -260,6 +263,7 @@ def train(cfg, logger):
                 log_str = f"[{epoch:2d}][{iter:5d}/{len(data_loader):5d}] " \
                           f"Time: {batch_time.val:.2f} ({batch_time.avg:.2f}) " \
                           f"Loss: {losses.val:.4f} ({losses.avg:.4f}) "
+
                 for name_log, (_, tracker) in metric_tracker.items():
                     log_str += f"{name_log}: {tracker.val:.4f} ({tracker.avg:.4f}) "
                 logger.info(log_str)
@@ -296,6 +300,7 @@ if __name__ == '__main__':
     if args.mode == 'train' and NUM_GPUS > 1:
         import torch.distributed as dist
         from torch.nn.parallel import DistributedDataParallel as DDP
+
 
         dist.init_process_group(backend='nccl')
         torch.cuda.set_device(args.local_rank)
