@@ -1,7 +1,7 @@
 seed: 123
 resume_dir: None
-save_model: False
-save_log: False
+save_model: True
+save_log: True
 save_path: my_runs/planeTR/
 if_debug: False
 debug_interval: 150
@@ -20,7 +20,7 @@ solver:
 
 dataset:
   name: 'scannet'
-  root_dir: /data/users/tanbin/dataset/processed_planeAE
+  root_dir: DATA_FOLDER/
   batch_size: 24  #-----------------------------------------------
   num_workers: 12
   root_dir_names: []
