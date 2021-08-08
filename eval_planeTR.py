@@ -23,7 +23,7 @@ from utils.misc import AverageMeter, get_optimizer, get_coordinate_map
 
 from utils.metric import eval_plane_recall_depth, eval_plane_recall_normal, evaluateMasks
 
-from utils.disp import plot_depth_recall_curve, plot_normal_recall_curve
+from utils.disp import plot_depth_recall_curve, plot_normal_recall_curve, visualizationBatch
 
 
 import matplotlib
@@ -112,6 +112,12 @@ def eval(cfg, logger):
 
     # load nets into gpu
     network = network.to(device)
+
+    # create debug dir
+    if cfg.if_debug:
+        debug_dir = 'debug_eval/'
+        if not os.path.exists(debug_dir):
+            os.makedirs(debug_dir)
 
     # load pretrained weights if existed
     if not (cfg.resume_dir == 'None'):
@@ -248,6 +254,33 @@ def eval(cfg, logger):
             # ------------------------------------ log info
             print(f"RI(+):{plane_Seg_Statistics[0]:.3f} | VI(-):{plane_Seg_Statistics[1]:.3f} | SC(+):{plane_Seg_Statistics[2]:.3f}")
 
+            # ---------------------------------- debug: visualization
+            if cfg.if_debug and args.local_rank == 0 and iter % cfg.debug_interval == 0:
+                if_save_cloud = True
+
+                # GT
+                gt_seg[gt_seg == 20] = -1
+                gt_seg = torch.from_numpy(gt_seg)
+                gt_depth = torch.from_numpy(gt_depth)
+                debug_dict = {'image': image[0].detach(), 'segmentation': gt_seg.detach(),
+                              'depth_GT': gt_depth.detach(),
+                              'K_inv_dot_xy_1': k_inv_dot_xy1,}
+                visualizationBatch(root_path=debug_dir, idx=iter, info='gt', data_dict=debug_dict,
+                                   non_plane_idx=-1, save_image=True, save_segmentation=True, save_depth=True,
+                                   save_cloud=if_save_cloud, save_ply=True)
+
+                # pred
+                predict_segmentation[predict_segmentation == (num_queries + 1)] = -1
+                predict_segmentation = torch.from_numpy(predict_segmentation)
+                inferred_depth = torch.from_numpy(inferred_depth)
+
+                debug_dict = {'image': image[0].detach(),
+                              'segmentation': predict_segmentation,
+                              'depth_predplane': inferred_depth.detach(),
+                              'K_inv_dot_xy_1': k_inv_dot_xy1,}
+                visualizationBatch(root_path=debug_dir, idx=iter, info='planeTR', data_dict=debug_dict,
+                                   non_plane_idx=-1, save_image=False, save_segmentation=True, save_depth=True,
+                                   save_cloud=if_save_cloud, save_ply=True)
 
         plane_Seg_Metric = plane_Seg_Metric / len(data_loader)
 

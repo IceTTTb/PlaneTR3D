@@ -1,9 +1,11 @@
 seed: 123
-resume_dir: ckpts/PlaneTR_Pretrained.pt  #------------
+resume_dir: ckpts/PlaneTR_Pretrained.pt
 
-save_log: True
+save_log: False
 save_path: results/
 
+if_debug: True
+debug_interval: 100
 
 dataset:
   name: 'scannet'
