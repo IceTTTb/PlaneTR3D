@@ -2,10 +2,16 @@
 
 This is the official implementation of our [ICCV 2021 paper](https://arxiv.org/abs/2107.13108)
 
+
 <img src="misc/network.jpg" width="600">
 
+
+## News
+- 2021.08.08: The visualization code is available now. You can find it in 'disp.py'. A simple example of how to visualize 
+the results is showed in 'eval_planeTR.py'.
+
 ## TODO
-- Supplement 2D/3D visualization code. 
+- ~~Supplement 2D/3D visualization code.~~
 
 ## Getting Started
 
