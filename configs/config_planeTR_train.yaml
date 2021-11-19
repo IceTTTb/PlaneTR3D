@@ -2,7 +2,7 @@ seed: 123
 resume_dir: None
 save_model: True
 save_log: True
-save_path: my_runs/planeTR/
+save_path: my_runs/debug/
 if_debug: False
 debug_interval: 150
 
@@ -34,7 +34,7 @@ model:
   use_lines: True
   plane_embedding_dim: 8
   num_queries: 20
-  loss_layer_num: 3
+  loss_layer_num: 2
   embedding_dist_threshold: 1.0
   stride: 1
   num_sample_pts: 2

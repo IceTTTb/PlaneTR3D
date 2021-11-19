@@ -103,11 +103,11 @@ class Transformer(nn.Module):
 
             hs = hs_context + hs_line
 
-            if self.loss_layer_num > 1 and self.loss_layer_num <= 3 and self.training:
+            if self.loss_layer_num > 1 and self.training:
+                assert self.loss_layer_num == 2
                 hs_final = hs[-1]
-                hs_c = hs_context[-1]
                 hs_l = hs_line[-1]
-                hs = torch.stack([hs_c, hs_l, hs_final], dim=0)
+                hs = torch.stack([hs_l, hs_final], dim=0)
         else:
             hs = self.decoder(tgt, memory, pos=pos_embed, query_pos=query_embed)
 

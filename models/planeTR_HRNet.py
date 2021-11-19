@@ -196,7 +196,7 @@ class PlaneTR_HRNet(nn.Module):
 
         # pre-defined
         self.loss_layer_num = loss_layer_num
-        assert self.loss_layer_num < 6
+        assert self.loss_layer_num <= 2
         self.return_inter = False
         self.predict_center = predict_center
         self.use_lines = use_lines
@@ -345,11 +345,13 @@ class PlaneTR_HRNet(nn.Module):
             output['pixel_depth'] = pixel_depth
 
         if self.loss_layer_num > 1 and self.training:
+            assert plane_prob.shape[0] == 2
+            # import pdb; pdb.set_trace()
             aux_outputs = []
-            aux_l = {'pred_logits': plane_prob[1], 'pred_plane_embedding': plane_embedding[1],
+            aux_l = {'pred_logits': plane_prob[0], 'pred_plane_embedding': plane_embedding[0],
                      'pixel_embedding': pixel_embedding}
             if self.predict_center:
-                aux_l['pred_center'] = plane_center[1]
+                aux_l['pred_center'] = plane_center[0]
             aux_outputs.append(aux_l)
 
             output['aux_outputs'] = aux_outputs
