@@ -2,7 +2,7 @@ seed: 123
 resume_dir: None
 save_model: True
 save_log: True
-save_path: my_runs/debug/
+save_path: my_runs/planeTR/
 if_debug: False
 debug_interval: 150
 
