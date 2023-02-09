@@ -7,6 +7,7 @@ This is the official implementation of our [ICCV 2021 paper](https://arxiv.org/a
 
 
 ## News
+- 2023.2.9: Upload the depth evaluation code on the NYUV2 dataset. 
 - 2021.08.08: The visualization code is available now. You can find it in 'disp.py'. A simple example of how to visualize 
 the results is showed in 'eval_planeTR.py'.
 
@@ -62,7 +63,7 @@ Run the following command to train our network on multiple GPUs:
 CUDA_VISIBLE_DEVICES=0,1,2 python -m torch.distributed.launch --nproc_per_node=3 --master_port 295025 train_planeTR.py
 ```
 
-## Evaluation
+## Evaluation on ScanNet
 Download the pretrained model [here](https://drive.google.com/drive/folders/1dCq4WxconPEDO8uZq4YDctZ8nxtvEtv8?usp=sharing) 
 and place it under the 'ckpts/' folder.
 
@@ -74,6 +75,48 @@ Run the following command to evaluate the performance:
 ```bash
 CUDA_VISIBLE_DEVICES=0 python eval_planeTR.py
 ```
+
+## Evaluation on NYUV2
+To evaluate the depth on the NYUV2 dataset, please first download the original data from [here](https://cs.nyu.edu/~silberman/datasets/nyu_depth_v2.html) 
+and the official train/test split from [here](http://horatio.cs.nyu.edu/mit/silberman/indoor_seg_sup/splits.mat). Then, you also 
+have to download our line detection results from [here](https://drive.google.com/file/d/1mOY1Hqch0KpfVDC92EUv-Kvh5eBXVIr3/view?usp=sharing). 
+After downloading all data, please put them under the folder 'nyudata/'. The structure of the data folder should be:
+```
+planeTR3D
+  --nyudata
+    |--nyu_depth_v2_labeled.mat
+    |--splits.mat
+    |--line_info\
+        |--*.txt
+```
+Run the following command to evaluate the performance:
+```bash
+CUDA_VISIBLE_DEVICES=0 python eval_nyudepth.py
+```
+
+Unfortunately, I lost the original detected line segments used in the paper. Thus I regenerated the line segments on
+the NYUV2 dataset with the latest [HAWPV3](https://github.com/cherubicXN/hawp). The depth metrics with these regenerated line segments are:
+<table><tbody>
+<!-- START TABLE -->
+<!-- TABLE HEADER -->
+<th valign="bottom">Rel</th>
+<th valign="bottom">log10</th>
+<th valign="bottom">RMSE</th>
+<th valign="bottom">d1</th>
+<th valign="bottom">d2</th>
+<th valign="bottom">d3</th>
+<tr>
+<!-- TABLE BODY -->
+<th valign="bottom">0.196</th>
+<th valign="bottom">0.096</th>
+<th valign="bottom">0.812</th>
+<th valign="bottom">63.8</th>
+<th valign="bottom">88.3</th>
+<th valign="bottom">96.0</th>
+</tr>
+</tbody></table>
+The new results are slightly different to the ones in the paper, but they do not influence the 
+conclusion.
 
 ## Citations
 If you find our work useful in your research, please consider citing:
