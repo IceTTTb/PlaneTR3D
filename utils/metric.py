@@ -38,6 +38,29 @@ def eval_plane_recall_depth(predSegmentations, gtSegmentations, predDepths, gtDe
     if len(predSegmentations.shape) == 2:
         predSegmentations = (np.expand_dims(predSegmentations, -1) == np.arange(predNumPlanes)).astype(np.float32)  # h, w, predNumPlanes
 
+    # predSegmentations_ = torch.from_numpy(predSegmentations).cuda()  # h, w
+    # gtSegmentations_ = torch.from_numpy(gtSegmentations).cuda()  # h, w
+    # # predict
+    # pred_masks = []
+    # for i in range(predNumPlanes):
+    #     mask_i = predSegmentations_ == i
+    #     mask_i = mask_i.float()
+    #     if mask_i.sum() > 0:
+    #         pred_masks.append(mask_i)
+    # masks_pred = torch.stack(pred_masks, dim=-1)
+    # predSegmentations = torch.round(masks_pred).cpu().numpy()  # h, w, N
+    #
+    # # gt
+    # gt_masks = []
+    # for i in range(20):
+    #     mask_i = gtSegmentations_ == i
+    #     mask_i = mask_i.float()
+    #     if mask_i.sum() > 0:
+    #         gt_masks.append(mask_i)
+    # gtSegmentations = torch.stack(gt_masks, dim=-1).cpu().numpy()
+    # gtNumPlanes = gtSegmentations.shape[-1]
+
+
     planeAreas = gtSegmentations.sum(axis=(0, 1))  # gt plane pixel number
 
     intersectionMask = np.expand_dims(gtSegmentations, -1) * np.expand_dims(predSegmentations, 2) > 0.5  # h, w, gtNumPlanes, predNumPlanes
@@ -80,10 +103,7 @@ def eval_plane_recall_normal(segmentation, gt_segmentation, param, gt_param, pre
     :param threshold: value for iou
     :return: percentage of correctly predicted ground truth planes correct plane
     """
-    depth_threshold_list = np.linspace(0.0, 30, 13)
-
-    # both prediction and ground truth segmentation contains non-planar region which indicated by label 20
-    # so we minus one
+    ''''''
     pred_plane_idxs = np.unique(segmentation)
     if pred_non_plane_idx in pred_plane_idxs:
         pred_plane_idx_max = pred_plane_idxs[-2]
@@ -91,13 +111,27 @@ def eval_plane_recall_normal(segmentation, gt_segmentation, param, gt_param, pre
         pred_plane_idx_max = pred_plane_idxs[-1]
     plane_num = pred_plane_idx_max + 1
 
-
     if 20 in np.unique(gt_segmentation):  # in GT plane Seg., number '20' indicates non-plane
         gt_plane_num = len(np.unique(gt_segmentation)) - 1
     else:
         gt_plane_num = len(np.unique(gt_segmentation))
+    ''''''
+    '''
+    plane_num = pred_non_plane_idx - 1
+    # gt
+    gt_plane_num = 0
+    for i in range(20):
+        mask_i = gt_segmentation == i
+        mask_i = mask_i
+        if mask_i.sum() > 0:
+            gt_plane_num += 1
+
+    gt_idxs = np.unique(gt_segmentation)
+    assert gt_idxs[gt_plane_num - 1] == gt_plane_num - 1
+    '''
 
     # 13: 0:0.05:0.6
+    depth_threshold_list = np.linspace(0.0, 30, 13)
     plane_recall = np.zeros((gt_plane_num, len(depth_threshold_list)))
     pixel_recall = np.zeros((gt_plane_num, len(depth_threshold_list)))
 
@@ -220,3 +254,27 @@ def evaluateMasks(predSegmentations, gtSegmentations, device, pred_non_plane_idx
         print('mask statistics', info)
         pass
     return info
+
+
+def evaluateDepths(predDepths, gtDepths, printInfo=False):
+    """Evaluate depth reconstruction accuracy"""
+    masks = gtDepths > 1e-4
+
+    numPixels = float(masks.sum())
+
+    rmse = np.sqrt((pow(predDepths - gtDepths, 2) * masks).sum() / numPixels)
+    rmse_log = np.sqrt(
+        (pow(np.log(np.maximum(predDepths, 1e-4)) - np.log(np.maximum(gtDepths, 1e-4)), 2) * masks).sum() / numPixels)
+    log10 = (np.abs(
+        np.log10(np.maximum(predDepths, 1e-4)) - np.log10(np.maximum(gtDepths, 1e-4))) * masks).sum() / numPixels
+    rel = (np.abs(predDepths - gtDepths) / np.maximum(gtDepths, 1e-4) * masks).sum() / numPixels
+    rel_sqr = (pow(predDepths - gtDepths, 2) / np.maximum(gtDepths, 1e-4) * masks).sum() / numPixels
+    deltas = np.maximum(predDepths / np.maximum(gtDepths, 1e-4), gtDepths / np.maximum(predDepths, 1e-4)) + (
+                1 - masks.astype(np.float32)) * 10000
+    accuracy_1 = (deltas < 1.25).sum() / numPixels
+    accuracy_2 = (deltas < pow(1.25, 2)).sum() / numPixels
+    accuracy_3 = (deltas < pow(1.25, 3)).sum() / numPixels
+    if printInfo:
+        print(('depth statistics', rel, rel_sqr, log10, rmse, rmse_log, accuracy_1, accuracy_2, accuracy_3))
+        pass
+    return [rel, rel_sqr, log10, rmse, rmse_log, accuracy_1, accuracy_2, accuracy_3]
